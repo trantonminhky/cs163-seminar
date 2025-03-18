@@ -555,6 +555,33 @@ Answer: (b) Multi-dimensional spatial data (e.g., geographic coordinates, rectan
 \end{question}
 Answer: (c) It uses bounding boxes to represent groups of spatial objects.
 
+\begin{question}{1. Count MBRs in an R-Tree}
+
+	\quad In R-Tree, a node’s MBR is the smallest axis-aligned rectangle that encloses all the data points or sub-regions within that node.
+
+	\quad Given a root of an R-Tree, you are asked to return the total number of MBRs.
+
+	\quad \underline{Constraint}: The R-Tree has a maximum fanout (number of children per node) of 4, and you must count the total number of MBRs without using recursion (e.g., use an iterative approach like a stack or queue).
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	int RTree::count_mbrs() {
+		return count_mbrs_recursive(root);
+	}
+
+	int RTree::count_mbrs_recursive(NOde* node) {
+		if (!node) return 0;
+		if (node->is_leaf) {
+			return node->children.size(); //Leaf nodes store MBRs directly
+		}
+		int total=0;
+		for (Node* child : node->children) {
+			total += count_mbrs_recursive(child);
+		}
+		return total;
+	}
+\end{lstlisting}
+
 \printbibliography
 
 \end{document}
