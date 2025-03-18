@@ -92,6 +92,20 @@
   attach title to upper={\ },
 }
 
+\NewTColorBox{question}{m}{
+  standard jigsaw,
+  sharp corners,
+  boxrule=0.4pt,
+  coltitle=black,
+  colframe=black,
+  opacityback=0,
+  opacitybacktitle=0,
+  fonttitle=\normalfont\bfseries\upshape,
+  fontupper=\normalfont,
+  title={Question #1},
+  attach title to upper={\ },
+}
+
 \title{R-Trees}
 \author{\textbf{Group 6: ARR-CHEESE}\\\foreignlanguage{vietnamese}{Trần Tôn Minh Kỳ, Phan Anh Khoa, Lê Lương Quốc Trung,}\\\foreignlanguage{vietnamese}{Phạm Võ Khang Duy}}
 \date{March 2025}
@@ -497,6 +511,60 @@ The R-Tree has a myriad of applications in the real world. A couple of questions
 	\item 2+3-tree
 	\item RT-tree.
 \end{itemize}
+
+\section{Exercises}
+We conclude this report with a handful of mental gymnastics for the readers.
+\subsection{Quizzes}
+\begin{question}{1. What is the primary purpose of an R-tree data structure?}
+	\begin{enumerate}[(a)]
+		\item To store one-dimensional numerical data.
+		\item To manage multi-dimensional spatial data.
+		\item To store text-based data.
+		\item To perform fast searching on strings.
+	\end{enumerate}
+\end{question}
+Answer: (b) To manage multi-dimensional spatial data.
+
+\begin{question}{2. In an R-tree, the leaf nodes contain}
+	\begin{enumerate}[(a)]
+		\item only pointers to the child nodes.
+		\item bounding boxes that cover regions.
+		\item actual spatial data or references to them.
+		\item pairs of keys and values.
+	\end{enumerate}
+\end{question}
+Answer: (c) actual spatial data or references to them.
+
+\begin{question}{3. What type of data is most commonly indexed using an R-tree?}
+	\begin{enumerate}[(a)]
+		\item Linear numerical data.
+		\item Multi-dimensional spatial data (e.g., geographic coordinates, rectangles).
+		\item Text strings.
+		\item Time series data.
+	\end{enumerate}
+\end{question}
+Answer: (b) Multi-dimensional spatial data (e.g., geographic coordinates, rectangles).
+
+\begin{question}{4. Which of the following is a key characteristic of an R-tree?}
+	\begin{enumerate}[(a)]
+		\item It is always unbalanced.
+		\item It can only handle one-dimensional data.
+		\item It uses bounding boxes to represent groups of spatial objects.
+		\item It stores data as linked lists.
+	\end{enumerate}
+\end{question}
+Answer: (c) It uses bounding boxes to represent groups of spatial objects.
+
+\subsection{Assignments}
+\begin{question}{1. Count MBRs in R-Trees}
+
+	In R-Tree, a node’s MBR is the smallest axis-aligned rectangle that encloses all the data points or sub-regions within that node.
+
+	Given a root of an R-Tree, you are asked to return the total number of MBRs.
+	
+	Constraint: The R-Tree has a maximum fanout (number of children per node) of 4, and you must count the total number of MBRs without using recursion (e.g., use an iterative approach like a stack or queue).
+
+\end{question}
 
 \printbibliography
 
