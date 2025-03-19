@@ -92,6 +92,20 @@
   attach title to upper={\ },
 }
 
+\NewTColorBox{question}{m}{
+  standard jigsaw,
+  sharp corners,
+  boxrule=0.4pt,
+  coltitle=black,
+  colframe=black,
+  opacityback=0,
+  opacitybacktitle=0,
+  fonttitle=\normalfont\bfseries\upshape,
+  fontupper=\normalfont,
+  title={Question #1},
+  attach title to upper={\ },
+}
+
 \title{R-Trees}
 \author{\textbf{Group 6: ARR-CHEESE}\\\foreignlanguage{vietnamese}{Trần Tôn Minh Kỳ, Phan Anh Khoa, Lê Lương Quốc Trung,}\\\foreignlanguage{vietnamese}{Phạm Võ Khang Duy}}
 \date{March 2025}
@@ -497,6 +511,162 @@ The R-Tree has a myriad of applications in the real world. A couple of questions
 	\item 2+3-tree
 	\item RT-tree.
 \end{itemize}
+
+\section{Exercises}
+We conclude this report with a handful of mental gymnastics for the readers.
+\subsection{Quizzes}
+\begin{question}{1. What is the primary purpose of an R-tree data structure?}
+	\begin{enumerate}[(a)]
+		\item To store one-dimensional numerical data.
+		\item To manage multi-dimensional spatial data.
+		\item To store text-based data.
+		\item To perform fast searching on strings.
+	\end{enumerate}
+\end{question}
+Answer: (b) To manage multi-dimensional spatial data.
+
+\begin{question}{2. In an R-tree, the leaf nodes contain}
+	\begin{enumerate}[(a)]
+		\item only pointers to the child nodes.
+		\item bounding boxes that cover regions.
+		\item actual spatial data or references to them.
+		\item pairs of keys and values.
+	\end{enumerate}
+\end{question}
+Answer: (c) actual spatial data or references to them.
+
+\begin{question}{3. What type of data is most commonly indexed using an R-tree?}
+	\begin{enumerate}[(a)]
+		\item Linear numerical data.
+		\item Multi-dimensional spatial data (e.g., geographic coordinates, rectangles).
+		\item Text strings.
+		\item Time series data.
+	\end{enumerate}
+\end{question}
+Answer: (b) Multi-dimensional spatial data (e.g., geographic coordinates, rectangles).
+
+\begin{question}{4. Which of the following is a key characteristic of an R-tree?}
+	\begin{enumerate}[(a)]
+		\item It is always unbalanced.
+		\item It can only handle one-dimensional data.
+		\item It uses bounding boxes to represent groups of spatial objects.
+		\item It stores data as linked lists.
+	\end{enumerate}
+\end{question}
+Answer: (c) It uses bounding boxes to represent groups of spatial objects.
+
+\begin{question}{1. Count MBRs in an R-Tree}
+
+	\quad In R-Tree, a node’s MBR is the smallest axis-aligned rectangle that encloses all the data points or sub-regions within that node.
+
+	\quad Given a root of an R-Tree, you are asked to return the total number of MBRs.
+
+	\quad \underline{Constraint}: The R-Tree has a maximum fanout (number of children per node) of 4, and you must count the total number of MBRs without using recursion (e.g., use an iterative approach like a stack or queue).
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	int RTree::count_mbrs() {
+		return count_mbrs_recursive(root);
+	}
+
+	int RTree::count_mbrs_recursive(NOde* node) {
+		if (!node) return 0;
+		if (node->is_leaf) {
+			return node->children.size(); //Leaf nodes store MBRs directly
+		}
+		int total=0;
+		for (Node* child : node->children) {
+			total += count_mbrs_recursive(child);
+		}
+		return total;
+	}
+\end{lstlisting}
+
+\begin{question}{2. Find overlapping MBRs in a range}
+	
+	\quad Two MBRs are called overlapped when they enclose the same space in the tree.
+	
+	\quad Given a R-Tree, its root and a range (a rectangle with coordinates), you are asked to return the number of overlapping MBRs in that range, and coordinates of each MBR. 
+	
+	\quad \underline{Constraint}: The R-Tree contains at least 10,000 nodes, and you must optimize the solution to run in O(log n + k) time complexity, where k is the number of overlapping MBRs, assuming a balanced R-Tree.
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	void RTree::count_overlaps(const MBR& range) {
+		std::vector<Node*> overlaps;
+		search_recursive(root, range, overlaps);
+		std::cout << "Number of MBRs overlapping with (" << range.x_min << ", " << range.y_min << ", " << range.x_max << ", " << range.y_max << "): " << overlaps.size() << std::endl;
+		for (const Node* node : overlaps) {
+			std::cout << "  Overlapping MBR: (" << node->mbr.x_min << ", " << node->mbr.y_min << ", " << node->mbr.x_max << ", " << node->mbr.y_max << ")\n";
+		}
+	}
+\end{lstlisting}
+
+\begin{question}{3. Calculate total area covered}
+	
+	\quad Each MBR in R-Tree represent a region which have its own area. Due to overlapping effect, there is a difference in root's MBR and all-leaves' MBRs.
+
+	\quad Given a R-Tree and its root, you are asked to calculate the sum of all leaf-level-MBRs' area and a area of root's MBR.
+
+	\quad \underline{Constraint}: The coordinates of the MBRs may include floating-point values, and you must compute the areas with a precision of at least 6 decimal places, accounting for potential numerical errors.
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	void RTree::total_area() {
+		if (root->children.empty()) {
+			std::cout << "Tree is empty. Root area: 0, Total leaf area: 0" << std::endl;
+			return;
+		}
+		int root_area = root->mbr.area();
+		int leaf_total = total_area_recursive(root);
+		std::cout << "Root MBR Area (" << root->mbr.x_min << ", " << root->mbr.y_min << ", " << root->mbr.x_max << ", " << root->mbr.y_max << "): " << root_area << std::endl;
+		std::cout << "Total Leaf MBR Area: " << leaf_total << std::endl;
+	}
+
+	int RTree::total_area_recursive(Node* node) {
+		if (node->is_leaf) {
+			int total = 0;
+			for (Node* child : node->children) {
+				total += child->mbr.area();
+			}
+			return total;
+		}
+		int total = 0;
+		for (Node* child : node->children) {
+			total += total_area_recursive(child);
+		}
+		return total;
+	}
+\end{lstlisting}
+
+\begin{question}{4. R-Tree depth calculation}
+	
+	\quad A depth of a R-Tree is the number of levels (or layers) of the tree.
+
+	\quad Given a R-Tree and its root, you are asked to return the depth of the tree.
+
+	\quad \underline{Constraint}: The R-Tree may be unbalanced (i.e., not all leaf nodes are at the same level), and you must compute the maximum depth of the tree rather than assuming a uniform depth.
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	int RTree::tree_depth() {
+		if (root->children.empty()) 
+			return 0;
+		return tree_depth_recursive(root);
+	}
+
+	int RTree::tree_depth_recursive(Node* node) {
+		if (node->is_leaf) 
+			return 1;    //Leaf is at depth 1
+		int max_depth = 0;
+		for (Node* child : node->children) {
+			int child_depth = tree_depth_recursive(child);
+			if (child_depth > max_depth) 
+				max_depth = child_depth;
+		}
+		return 1 + max_depth;   //Add 1 for current level
+	}
+\end{lstlisting}
 
 \printbibliography
 
