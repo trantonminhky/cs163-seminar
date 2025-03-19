@@ -639,6 +639,35 @@ Answer: (c) It uses bounding boxes to represent groups of spatial objects.
 	}
 \end{lstlisting}
 
+\begin{question}{4. R-Tree depth calculation}
+	
+	\quad A depth of a R-Tree is the number of levels (or layers) of the tree.
+
+	\quad Given a R-Tree and its root, you are asked to return the depth of the tree.
+
+	\quad \underline{Constraint}: The R-Tree may be unbalanced (i.e., not all leaf nodes are at the same level), and you must compute the maximum depth of the tree rather than assuming a uniform depth.
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	int RTree::tree_depth() {
+		if (root->children.empty()) 
+			return 0;
+		return tree_depth_recursive(root);
+	}
+
+	int RTree::tree_depth_recursive(Node* node) {
+		if (node->is_leaf) 
+			return 1;    //Leaf is at depth 1
+		int max_depth = 0;
+		for (Node* child : node->children) {
+			int child_depth = tree_depth_recursive(child);
+			if (child_depth > max_depth) 
+				max_depth = child_depth;
+		}
+		return 1 + max_depth;   //Add 1 for current level
+	}
+\end{lstlisting}
+
 \printbibliography
 
 \end{document}
