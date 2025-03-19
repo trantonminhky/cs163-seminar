@@ -582,7 +582,7 @@ Answer: (c) It uses bounding boxes to represent groups of spatial objects.
 	}
 \end{lstlisting}
 
-\begin{question}{2. Find overlapping MBRs in a Range}
+\begin{question}{2. Find overlapping MBRs in a range}
 	
 	\quad Two MBRs are called overlapped when they enclose the same space in the tree.
 	
@@ -599,6 +599,43 @@ Answer: (c) It uses bounding boxes to represent groups of spatial objects.
 		for (const Node* node : overlaps) {
 			std::cout << "  Overlapping MBR: (" << node->mbr.x_min << ", " << node->mbr.y_min << ", " << node->mbr.x_max << ", " << node->mbr.y_max << ")\n";
 		}
+	}
+\end{lstlisting}
+
+\begin{question}{3. Calculate total area covered}
+	
+	\quad Each MBR in R-Tree represent a region which have its own area. Due to overlapping effect, there is a difference in root's MBR and all-leaves' MBRs.
+
+	\quad Given a R-Tree and its root, you are asked to calculate the sum of all leaf-level-MBRs' area and a area of root's MBR.
+
+	\quad \underline{Constraint}: The coordinates of the MBRs may include floating-point values, and you must compute the areas with a precision of at least 6 decimal places, accounting for potential numerical errors.
+\end{question}
+
+\begin{lstlisting}[language=c++]
+	void RTree::total_area() {
+		if (root->children.empty()) {
+			std::cout << "Tree is empty. Root area: 0, Total leaf area: 0" << std::endl;
+			return;
+		}
+		int root_area = root->mbr.area();
+		int leaf_total = total_area_recursive(root);
+		std::cout << "Root MBR Area (" << root->mbr.x_min << ", " << root->mbr.y_min << ", " << root->mbr.x_max << ", " << root->mbr.y_max << "): " << root_area << std::endl;
+		std::cout << "Total Leaf MBR Area: " << leaf_total << std::endl;
+	}
+
+	int RTree::total_area_recursive(Node* node) {
+		if (node->is_leaf) {
+			int total = 0;
+			for (Node* child : node->children) {
+				total += child->mbr.area();
+			}
+			return total;
+		}
+		int total = 0;
+		for (Node* child : node->children) {
+			total += total_area_recursive(child);
+		}
+		return total;
 	}
 \end{lstlisting}
 
